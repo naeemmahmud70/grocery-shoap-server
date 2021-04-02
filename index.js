@@ -22,34 +22,48 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 client.connect(err => {
   const productsCollection = client.db("grocery").collection("products");
+  const checkOutCollection = client.db("grocery").collection("checkOut");
 
-  app.get('/products', (req, res)=>{
+  app.get('/products', (req, res) => {
     productsCollection.find()
-    .toArray((err, items)=>{
-      res.send(items)
-    })
+      .toArray((err, items) => {
+        res.send(items)
+      })
+  })
+
+  app.get('/checkOut', (req, res) => {
+    console.log(req.query.email)
+    checkOutCollection.find({email: req.query.email})
+      .toArray((err, items) => {
+        res.send(items)
+      })
   })
 
 
 
-  app.get('/product/:id',(req, res)=>{
-    productsCollection.find({_id: ObjectId(req.params.id)})
-    .toArray((err, documents)=>{
-      res.send(documents[0])
-      console.log(documents)
-    })
+  app.get('/product/:id', (req, res) => {
+    productsCollection.find({ _id: ObjectId(req.params.id) })
+      .toArray((err, documents) => {
+        res.send(documents[0])
+      })
+  })
+
+  app.post('/addCheckOut', (req, res) => {
+    const newCheckout = req.body;
+    checkOutCollection.insertOne(newCheckout)
+      .then(result => {
+        res.send(result.insertedCount > 0)
+      })
+
   })
 
 
-
-  app.post('/addProduct', (req, res)=>{
+  app.post('/addProduct', (req, res) => {
     const newProduct = req.body;
-    console.log('adding new product:', newProduct)
     productsCollection.insertOne(newProduct)
-    .then(result=>{
-      console.log('inserted count', result.insertedCount)
-      res.send(result.insertedCount > 0)
-    })
+      .then(result => {
+        res.send(result.insertedCount > 0)
+      })
   })
 
 });
