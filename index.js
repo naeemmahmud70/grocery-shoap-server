@@ -31,6 +31,24 @@ client.connect(err => {
       })
   })
 
+
+
+
+
+  app.delete('/delete/:id', (req, res)=>{
+    const id = ObjectId(req.params.id)
+    console.log("delete this",id)
+    productsCollection.deleteOne({_id: id})
+    .then(result => {
+      console.log(result)
+      res.send(result)
+    })
+
+  })
+
+
+
+
   app.get('/checkOut', (req, res) => {
     console.log(req.query.email)
     checkOutCollection.find({email: req.query.email})
@@ -62,7 +80,7 @@ client.connect(err => {
     const newProduct = req.body;
     productsCollection.insertOne(newProduct)
       .then(result => {
-        res.send(result.insertedCount > 0)
+        res.redirect('/')
       })
   })
 
